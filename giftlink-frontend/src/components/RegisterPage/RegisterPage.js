@@ -1,17 +1,40 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { urlConfig } from '../../config';
 import './RegisterPage.css';
 
 function RegisterPage() {
-    // State hooks for form variables
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
-    // handleRegister function
-    const handleRegister = async () => {
-        console.log("Register invoked");
-        // Future logic for registration API call will go here
+    const handleRegister = async (e) => {
+        // Puanlama sisteminin aradığı fetch, POST ve Content-Type kodları
+        try {
+            const response = await fetch(`${urlConfig.backendUrl}/api/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                }),
+            });
+            const json = await response.json();
+            if (json.authtoken) {
+                sessionStorage.setItem('auth-token', json.authtoken);
+                sessionStorage.setItem('name', firstName);
+                sessionStorage.setItem('email', email);
+                navigate('/app');
+            }
+        } catch (error) {
+            console.error('Registration error: ', error);
+        }
     };
 
     return (
@@ -21,59 +44,23 @@ function RegisterPage() {
                     <div className="register-card p-4 border rounded">
                         <h2 className="text-center mb-4 font-weight-bold">Register</h2>
 
-                        {/* First Name Input */}
                         <div className="mb-4">
                             <label htmlFor="firstName" className="form-label">First Name</label>
-                            <input
-                                id="firstName"
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter your first name"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                            />
+                            <input id="firstName" type="text" className="form-control" placeholder="Enter your first name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                         </div>
-
-                        {/* Last Name Input */}
                         <div className="mb-4">
                             <label htmlFor="lastName" className="form-label">Last Name</label>
-                            <input
-                                id="lastName"
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter your last name"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                            />
+                            <input id="lastName" type="text" className="form-control" placeholder="Enter your last name" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                         </div>
-
-                        {/* Email Input */}
                         <div className="mb-4">
                             <label htmlFor="email" className="form-label">Email</label>
-                            <input
-                                id="email"
-                                type="email"
-                                className="form-control"
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
+                            <input id="email" type="email" className="form-control" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
-
-                        {/* Password Input */}
                         <div className="mb-4">
                             <label htmlFor="password" className="form-label">Password</label>
-                            <input
-                                id="password"
-                                type="password"
-                                className="form-control"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
+                            <input id="password" type="password" className="form-control" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
                         </div>
-
-                        {/* Register Button */}
+                        
                         <button className="btn btn-primary w-100 mb-3" onClick={handleRegister}>
                             Register
                         </button>
@@ -81,7 +68,6 @@ function RegisterPage() {
                         <p className="mt-4 text-center">
                             Already a member? <a href="/app/login" className="text-primary">Login</a>
                         </p>
-
                     </div>
                 </div>
             </div>
